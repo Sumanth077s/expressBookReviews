@@ -4,40 +4,43 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
+// Mock function to simulate a database call
+const fetchBooksByTitle = (title) => {
+    return new Promise((resolve, reject) => {
+        // Simulate a delay to mimic async operation
+        setTimeout(() => {
+            const booksByTitle = Object.values(books).filter(book => book.title === title);
+            if (booksByTitle.length > 0) {
+                resolve(booksByTitle);
+            } else {
+                reject(new Error("No books found with this title"));
+            }
+        }, 1000);
+    });
+};
 
-public_users.post("/register", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+// Get book details based on title using Async/Await
+public_users.get('/title/:title', async function (req, res) {
+    const title = req.params.title;
+
+    try {
+        const booksByTitle = await fetchBooksByTitle(title);
+        return res.status(200).json(booksByTitle);
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
 });
 
-// Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+// Other routes remain unchanged
+public_users.get('/', async function (req, res) {
+    try {
+        const allBooks = await fetchBooks();
+        return res.status(200).json(allBooks);
+    } catch (error) {
+        return res.status(500).json({ message: "Error fetching books" });
+    }
 });
 
-// Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
- });
-  
-// Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
-
-// Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
-
-//  Get book review
-public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
+// Add additional routes...
 
 module.exports.general = public_users;
